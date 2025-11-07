@@ -1,44 +1,34 @@
 version: 2.1
 
-orbs:
-  node: circleci/node@5.1.0
-
 jobs:
   build-and-scan:
     docker:
-      - image: cimg/node:20.9
-    working_directory: ~/project
+      - image: cimg/node:18.17
+    working_directory: ~/project/backend
     steps:
       - checkout
 
-      # ✅ Step 1: Go to backend folder and install dependencies
       - run:
-          name: Install dependencies
-          command: |
-            cd customer-payment-portal/backend
-            npm ci || npm install
+          name: Install Dependencies
+          command: npm install
 
-      # ✅ Step 2: Run tests (optional)
       - run:
-          name: Run tests
+          name: Run Tests
           command: |
-            cd customer-payment-portal/backend
-            npm test || echo "No tests to run"
+            echo "Running tests..."
+            npm test || echo "No tests found - continuing"
 
-      # ✅ Step 3: Run SonarQube scan
       - run:
-          name: SonarQube scan
+          name: Run SonarQube Scan
           command: |
-            npm install -g sonar-scanner
-            cd customer-payment-portal/backend
-            sonar-scanner \
-              -Dsonar.projectKey=customer-payment-portal \
+            npx sonar-scanner \
+              -Dsonar.projectKey=secure-app-pipeline \
+              -Dsonar.organization=<your-org-if-using-sonarcloud> \
               -Dsonar.sources=. \
               -Dsonar.host.url=$SONAR_HOST_URL \
               -Dsonar.login=$SONAR_TOKEN
 
 workflows:
-  version: 2
-  build_and_scan:
+  build_and_scan_workflow:
     jobs:
       - build-and-scan
