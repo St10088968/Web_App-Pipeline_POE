@@ -11,34 +11,28 @@ jobs:
     steps:
       - checkout
 
-      # ✅ Step 1: Backend dependencies
+      # ✅ Step 1: Go to backend folder and install dependencies
       - run:
-          name: Install backend dependencies
+          name: Install dependencies
           command: |
-            cd backend
+            cd customer-payment-portal/backend
             npm ci || npm install
 
-      # ✅ Step 2: Frontend dependencies
+      # ✅ Step 2: Run tests (optional)
       - run:
-          name: Install frontend dependencies
+          name: Run tests
           command: |
-            cd frontend
-            npm ci || npm install
+            cd customer-payment-portal/backend
+            npm test || echo "No tests to run"
 
-      # ✅ Step 3: Optional test step
+      # ✅ Step 3: Run SonarQube scan
       - run:
-          name: Run tests (if any)
-          command: |
-            cd backend && npm test || echo "No backend tests"
-            cd ../frontend && npm test || echo "No frontend tests"
-
-      # ✅ Step 4: SonarQube scan
-      - run:
-          name: Run SonarQube analysis
+          name: SonarQube scan
           command: |
             npm install -g sonar-scanner
+            cd customer-payment-portal/backend
             sonar-scanner \
-              -Dsonar.projectKey=secure-app-pipeline \
+              -Dsonar.projectKey=customer-payment-portal \
               -Dsonar.sources=. \
               -Dsonar.host.url=$SONAR_HOST_URL \
               -Dsonar.login=$SONAR_TOKEN
